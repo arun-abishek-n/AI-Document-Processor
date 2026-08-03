@@ -1,0 +1,24 @@
+# Web UI
+streamlit>=1.37.0
+
+# Image processing
+opencv-python-headless>=4.10.0
+Pillow>=10.4.0
+numpy>=1.26.0
+
+# OCR
+easyocr>=1.7.1
+# pytesseract is only needed if you switch OCR_ENGINE to "tesseract" in config.py.
+# It also requires installing the Tesseract binary separately (not pip-installable):
+# https://github.com/tesseract-ocr/tesseract
+pytesseract>=0.3.10
+
+# PDF rasterization
+PyMuPDF>=1.24.0
+# pdf2image is a supported alternative to PyMuPDF for PDF rasterization, but it
+# requires the Poppler binary to be installed separately. PyMuPDF is used by
+# default so the project runs with a plain `pip install` and no extra setup.
+# pdf2image>=1.17.0
+
+# Data handling & export
+pandas>=2.2.0

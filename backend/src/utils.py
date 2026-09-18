@@ -18,6 +18,20 @@ from PIL import Image
 
 import config
 
+# On Windows, sys.stdout defaults to the legacy console codepage (e.g.
+# cp1252/"charmap") rather than UTF-8. EasyOCR's model-download progress bar
+# (and OCR text itself, e.g. accented vendor names or currency symbols) can
+# contain characters that codepage can't represent, which raises
+# UnicodeEncodeError and crashes the pipeline mid-request. Forcing UTF-8 here
+# — before any pipeline module (ocr.py, etc.) does its first print/log — is
+# a one-time, process-wide fix. errors="replace" is a safety net so a truly
+# unmappable character degrades to "?" instead of crashing the process again.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass  # stream doesn't support reconfigure (e.g. captured by some test runners)
+
 
 def get_logger(name: str) -> logging.Logger:
     """Return a module-level logger configured to write to file + stdout.
@@ -29,21 +43,22 @@ def get_logger(name: str) -> logging.Logger:
     logger = logging.getLogger(name)
     if logger.handlers:
         # get_logger(__name__) is called once per module at import time, but
-        # Streamlit re-executes app.py on every user interaction. Without this
-        # guard, each rerun would attach a fresh pair of handlers to the same
-        # logger, and every log line would be printed/written multiple times.
+        # a module can be re-imported within the same process (e.g. reload
+        # workers, test collection). Without this guard, a re-import would
+        # attach a fresh pair of handlers to the same logger, and every log
+        # line would be printed/written multiple times.
         return logger
 
     logger.setLevel(config.LOG_LEVEL)
     formatter = logging.Formatter(config.LOG_FORMAT)
 
-    # Persist logs to disk so issues can be diagnosed after the Streamlit
-    # session has ended, not just while watching the terminal live.
+    # Persist logs to disk so issues can be diagnosed after the process has
+    # exited, not just while watching the terminal live.
     file_handler = logging.FileHandler(config.LOG_FILE, encoding="utf-8")
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
 
-    # Also echo to stdout so `streamlit run app.py` shows progress live.
+    # Also echo to stdout so `uvicorn app.main:app` shows progress live.
     stream_handler = logging.StreamHandler(sys.stdout)
     stream_handler.setFormatter(formatter)
     logger.addHandler(stream_handler)

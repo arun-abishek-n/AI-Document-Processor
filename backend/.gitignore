@@ -1,0 +1,11 @@
+# Generated outputs (keep the folder, ignore its contents)
+outputs/*
+!outputs/.gitkeep
+
+# OCR model weights (downloaded on first run, or baked in by Dockerfile)
+models/*
+!models/.gitkeep
+
+# Logs
+logs/
+*.log

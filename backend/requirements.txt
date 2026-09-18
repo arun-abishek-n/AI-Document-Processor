@@ -1,5 +1,7 @@
-# Web UI
-streamlit>=1.37.0
+# API
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+python-multipart>=0.0.9
 
 # Image processing
 opencv-python-headless>=4.10.0

@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+.pytest_cache/
 
 # Virtual environments
 venv/
@@ -9,20 +10,8 @@ venv/
 env/
 ENV/
 
-# Streamlit
-.streamlit/secrets.toml
-
-# Logs
-logs/
-*.log
-
-# Generated outputs (keep the folder, ignore its contents)
-outputs/*
-!outputs/.gitkeep
-
-# OCR model weights (downloaded on first run, can be large)
-models/*
-!models/.gitkeep
+# Node / frontend
+node_modules/
 
 # IDE / OS
 .vscode/

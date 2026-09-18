@@ -18,9 +18,23 @@ OUTPUT_DIR: Path = BASE_DIR / "outputs"
 SAMPLE_DOCS_DIR: Path = BASE_DIR / "sample_documents"
 MODELS_DIR: Path = BASE_DIR / "models"
 LOG_DIR: Path = BASE_DIR / "logs"
+DATA_DIR: Path = BASE_DIR / "data"
 
-for _dir in (OUTPUT_DIR, MODELS_DIR, LOG_DIR):
+for _dir in (OUTPUT_DIR, MODELS_DIR, LOG_DIR, DATA_DIR):
     _dir.mkdir(parents=True, exist_ok=True)
+
+# --------------------------------------------------------------------------
+# Database & auth
+# --------------------------------------------------------------------------
+# SQLite by default (zero setup for a demo). Point DATABASE_URL at a hosted
+# Postgres instance instead for persistence across container restarts.
+DATABASE_URL: str = os.getenv("DATABASE_URL", f"sqlite:///{DATA_DIR / 'app.db'}")
+
+# A real deployment MUST override this via the JWT_SECRET env var — the
+# fallback only exists so local dev works without an .env file.
+JWT_SECRET: str = os.getenv("JWT_SECRET", "dev-insecure-secret-change-me")
+JWT_ALGORITHM: str = "HS256"
+JWT_EXPIRE_MINUTES: int = 12 * 60
 
 # --------------------------------------------------------------------------
 # Upload constraints
@@ -73,8 +87,11 @@ FIELD_PATTERNS: dict[str, str] = {
     "tax_amount": r"(?:tax|vat|gst)\s*(?:\(\d{1,2}%\))?\s*[:\-]?\s*[\$₹€£]?\s*([\d,]+\.\d{2})",
     "email": r"([A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,})",
     "phone": r"(?:phone|tel|contact)?\s*[:\-]?\s*(\+?\d[\d\s\-\(\)]{8,15}\d)",
-    "vendor_name": r"(?:vendor|from|bill\s*from|company)\s*[:\-]?\s*([A-Za-z0-9&.,\-\s]{3,40})",
-    "customer_name": r"(?:bill\s*to|customer|client)\s*[:\-]?\s*([A-Za-z0-9&.,\-\s]{3,40})",
+    # Space only (not \s) in the capture class — \s would also match the
+    # newline joining OCR lines, letting the match greedily swallow the
+    # next line's label (e.g. "Acme Supplies Co\nBill To").
+    "vendor_name": r"(?:vendor|from|bill\s*from|company)\s*[:\-]?\s*([A-Za-z0-9&.,\- ]{3,40})",
+    "customer_name": r"(?:bill\s*to|customer|client)\s*[:\-]?\s*([A-Za-z0-9&.,\- ]{3,40})",
 }
 
 # Fields considered mandatory for a document to be marked "valid"

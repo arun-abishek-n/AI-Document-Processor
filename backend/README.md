@@ -10,10 +10,13 @@ pinned: false
 
 # AI Smart Document Processing — Backend
 
-FastAPI service wrapping the OCR + field-extraction + validation pipeline
-(`src/`). The frontend (`../frontend`) is a separate deployable that talks to
-this API over HTTP — see the [root README](../README.md) for the full
-project overview and architecture.
+FastAPI service: JWT auth + roles, configurable Document Types and Match
+Configurations (SQLAlchemy/SQLite), a keyword-based document-classification
+service, a 2-way/3-way matching engine, and the original OCR + field-
+extraction pipeline (`src/`) that everything else is built on top of. The
+frontend (`../frontend`) is a separate deployable that talks to this API
+over HTTP — see the [root README](../README.md) for the full project
+overview, architecture diagrams, and matching-engine explanation.
 
 The YAML block above is Hugging Face Spaces' config format — it's what makes
 this folder deployable as a Docker Space directly (see "Deploy to Hugging
@@ -21,11 +24,18 @@ Face Spaces" in the root README).
 
 ## Endpoints
 
-| Method | Path           | Description                                    |
-| ------ | -------------- | ----------------------------------------------- |
-| GET    | `/api/health`  | Liveness + config check (no OCR model loaded)   |
-| POST   | `/api/process` | Upload a PDF/JPG/PNG, get back structured JSON  |
-| GET    | `/docs`        | Interactive OpenAPI docs (Swagger UI)           |
+See the [root README's API Endpoints section](../README.md#api-endpoints)
+for the full table. Quick reference:
+
+| Method | Path                  | Description                                    |
+| ------ | ----------------------- | ----------------------------------------------- |
+| GET    | `/api/health`          | Liveness + config check (no OCR model loaded)   |
+| POST   | `/api/process`         | Standalone single-document OCR extraction        |
+| POST   | `/api/auth/login`      | Get a JWT for one of the demo accounts           |
+| \*     | `/api/document-types`, `/api/match-configs`, `/api/users` | Configuration CRUD (role-gated) |
+| \*     | `/api/batches*`        | Upload → confirm type → run matching             |
+| GET    | `/api/dashboard/summary` | Real KPI aggregates                            |
+| GET    | `/docs`                | Interactive OpenAPI docs (Swagger UI)            |
 
 ## Local development
 
@@ -51,5 +61,5 @@ baked into `config.py`.
 ```bash
 pip install -r requirements-dev.txt
 pytest                 # fast unit + API tests (no OCR model download)
-pytest -m integration  # + one real end-to-end OCR test
+pytest -m integration  # + real end-to-end OCR tests (single document + full batch match)
 ```

@@ -4,6 +4,7 @@ __pycache__/
 outputs/
 models/
 logs/
+data/
 tests/
 .pytest_cache/
 .env

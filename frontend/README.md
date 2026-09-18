@@ -1,8 +1,16 @@
 # AI Smart Document Processing — Frontend
 
-React + TypeScript + Vite + Tailwind CSS UI for the document processing
-pipeline. Talks to the FastAPI backend (`../backend`) over REST — see the
-[root README](../README.md) for the full project overview.
+React + TypeScript + Vite + Tailwind CSS + React Router UI: login/roles,
+Document Types and Match Configurations management, and the batch
+upload → confirm → match → results workflow. Talks to the FastAPI backend
+(`../backend`) over REST — see the [root README](../README.md) for the full
+project overview, architecture, and matching-engine explanation.
+
+Routes: `/login`, `/dashboard`, `/document-types`, `/match-configs`,
+`/users` (Admin only), `/process`, `/process/:id` — each protected by
+`ProtectedRoute` (see `src/components/ProtectedRoute.tsx`), which redirects
+unauthenticated visitors to `/login` and role-inappropriate ones to
+`/dashboard`.
 
 ## Local development
 

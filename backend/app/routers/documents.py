@@ -1,4 +1,10 @@
-"""API endpoints: document processing and health check."""
+"""Standalone single-document endpoints: health check + raw OCR extraction.
+
+Unchanged from before the auth/config/matching additions — this remains a
+valid endpoint on its own (upload one file, get back extracted fields), just
+no longer the only workflow now that batches.py exists for the multi-document
+2-way/3-way matching flow.
+"""
 
 from __future__ import annotations
 

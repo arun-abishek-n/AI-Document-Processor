@@ -9,3 +9,7 @@ models/*
 # Logs
 logs/
 *.log
+
+# SQLite database
+data/*
+!data/.gitkeep
